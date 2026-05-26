@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. "$here\..\src\scraper-runner.ps1"
+. "$here/../src/scraper-runner.ps1"
 
 Describe "Test-DockerInstalled" {
     It "returns true when docker command is available" {

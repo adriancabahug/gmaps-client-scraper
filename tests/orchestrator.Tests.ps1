@@ -1,9 +1,9 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. "$here\..\src\config.ps1"
-. "$here\..\src\query-manager.ps1"
-. "$here\..\src\scraper-runner.ps1"
-. "$here\..\src\output-processor.ps1"
-. "$here\..\src\orchestrator.ps1"
+. "$here/../src/config.ps1"
+. "$here/../src/query-manager.ps1"
+. "$here/../src/scraper-runner.ps1"
+. "$here/../src/output-processor.ps1"
+. "$here/../src/orchestrator.ps1"
 
 Describe "Invoke-ScraperPipeline" {
     Context "dry run" {

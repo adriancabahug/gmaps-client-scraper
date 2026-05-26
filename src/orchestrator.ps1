@@ -26,7 +26,7 @@ function Invoke-ScraperPipeline {
 
     if (-not $DryRun) {
         if (-not (Test-DockerInstalled)) {
-            throw "Docker is not installed. Please install Docker Desktop for Windows from https://www.docker.com/products/docker-desktop/"
+            throw "Docker is not installed. Install Docker Desktop (https://www.docker.com/products/docker-desktop/) and try again."
         }
         New-Item -ItemType Directory -Path "gmaps-output" -Force | Out-Null
     }

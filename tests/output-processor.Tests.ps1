@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. "$here\..\src\output-processor.ps1"
+. "$here/../src/output-processor.ps1"
 
 Describe "Import-RawResults" {
     It "reads valid JSON and returns objects" {

@@ -1,0 +1,24 @@
+name: Cloud Outbound Scraper
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Execute Scraper Pipeline
+        shell: pwsh
+        run: ./run-scraper.ps1
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f gmaps-output/ scrape-state.json
+          git commit -m "Automated scrape: updated prospects and state [skip ci]" || exit 0
+          git push

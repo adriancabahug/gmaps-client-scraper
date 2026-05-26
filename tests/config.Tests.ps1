@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. "$here\..\src\config.ps1"
+. "$here/../src/config.ps1"
 
 Describe "Get-LocationBBox" {
     It "returns bounding box for a known city" {

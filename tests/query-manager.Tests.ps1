@@ -1,5 +1,5 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. "$here\..\src\query-manager.ps1"
+. "$here/../src/query-manager.ps1"
 
 Describe "Get-QueryList" {
     Context "input validation" {
