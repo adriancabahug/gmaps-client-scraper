@@ -19,6 +19,11 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add -f gmaps-output/ scrape-state.json
-          git commit -m "Automated scrape: updated prospects and state [skip ci]" || exit 0
+
+          mkdir -p gmaps-output
+
+          git add gmaps-output/ || true
+          git add scrape-state.json || true
+
+          git commit -m "Automated scrape: updated prospects and state [skip ci]" || echo "No changes to commit"
           git push
