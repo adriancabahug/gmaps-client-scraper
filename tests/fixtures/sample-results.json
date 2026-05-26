@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Dallas Roofing Pros",
+    "phone": "(214) 555-0101",
+    "website": "https://dallasroofingpros.com",
+    "address": "100 Main St, Dallas, TX 75201",
+    "category": "Roofing contractor",
+    "review_rating": 4.8,
+    "review_count": 127,
+    "place_id": "ChIJ1"
+  },
+  {
+    "title": "Big D Roofers",
+    "phone": "(972) 555-0102",
+    "website": "https://bigdroofers.com",
+    "address": "200 Elm St, Dallas, TX 75202",
+    "category": "Roofing contractor",
+    "review_rating": 4.5,
+    "review_count": 89,
+    "place_id": "ChIJ2"
+  },
+  {
+    "title": "Dallas Roofing Pros",
+    "phone": "(214) 555-0101",
+    "website": "https://dallasroofingpros.com",
+    "address": "100 Main St, Dallas, TX 75201",
+    "category": "Roofing contractor",
+    "review_rating": 4.8,
+    "review_count": 127,
+    "place_id": "ChIJ1"
+  },
+  {
+    "title": "Lone Star Roofing",
+    "phone": "",
+    "website": "https://lonestarroofing.com",
+    "address": "300 Oak St, Dallas, TX 75203",
+    "category": "Roofing contractor",
+    "review_rating": 4.2,
+    "review_count": 45,
+    "place_id": "ChIJ3"
+  },
+  {
+    "title": "Texas Top Roofers",
+    "phone": null,
+    "website": "https://texastroofers.com",
+    "address": "400 Pine St, Dallas, TX 75204",
+    "category": "Roofing contractor",
+    "review_rating": 4.6,
+    "review_count": 210,
+    "place_id": "ChIJ4"
+  },
+  {
+    "title": "Apex Roofing Solutions",
+    "phone": "(469) 555-0103",
+    "website": "https://apexroofing.com",
+    "address": "500 Cedar St, Dallas, TX 75205",
+    "category": "Roofing contractor",
+    "review_rating": 4.9,
+    "review_count": 312,
+    "place_id": "ChIJ5"
+  }
+]
