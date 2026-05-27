@@ -19,14 +19,14 @@ Describe "Test-DockerInstalled" {
 
 Describe "Test-DockerImage" {
     It "returns true when image exists locally" {
-        Mock Invoke-Expression { return "abcdef123456" } -ParameterFilter { $Command -like "*docker images*" }
+        Mock Invoke-DockerImagesQuery { return "abcdef123456" }
 
         $result = Test-DockerImage
         $result | Should Be $true
     }
 
     It "returns false when image is not pulled" {
-        Mock Invoke-Expression { return $null } -ParameterFilter { $Command -like "*docker images*" }
+        Mock Invoke-DockerImagesQuery { throw "not found" }
 
         $result = Test-DockerImage
         $result | Should Be $false
@@ -56,6 +56,7 @@ Describe "Get-DockerCommand" {
         $cmd | Should Match "^docker run"
         $cmd | Should Match "--rm"
         $cmd | Should Match "gosom/google-maps-scraper"
+        $cmd | Should Match '-query "Roofers Dallas"'
         $cmd | Should Match "-depth 1"
         $cmd | Should Match '-grid-bbox "32.6,-96.85,32.9,-96.65"'
         $cmd | Should Match "-grid-cell 2"

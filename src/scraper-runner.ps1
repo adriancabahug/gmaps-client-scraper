@@ -7,9 +7,17 @@ function Test-DockerInstalled {
     }
 }
 
+function Invoke-DockerImagesQuery {
+    & docker images -q gosom/google-maps-scraper 2>$null
+}
+
 function Test-DockerImage {
-    $result = Invoke-Expression "docker images -q gosom/google-maps-scraper 2>`$null"
-    return [bool]$result
+    try {
+        $imageId = Invoke-DockerImagesQuery
+        return [bool](![string]::IsNullOrWhiteSpace($imageId))
+    } catch {
+        return $false
+    }
 }
 
 function Invoke-DockerCommand {
@@ -35,16 +43,20 @@ function Get-DockerCommand {
 
     $bboxStr = "$($BBox[0]),$($BBox[1]),$($BBox[2]),$($BBox[3])"
 
-    $cmd = "docker run --rm -v gmaps-playwright-cache:/opt"
-    $cmd += " -v `"`$PWD/$OutputDir`":/out"
-    $cmd += " gosom/google-maps-scraper"
-    $cmd += " -input /queries.txt"
-    $cmd += " -results /out/results.json -json"
-    $cmd += " -depth $Depth"
-    $cmd += " -grid-bbox `"$bboxStr`""
-    $cmd += " -grid-cell $CellSize"
-    if ($Email) { $cmd += " -email" }
-    $cmd += " -exit-on-inactivity 3m"
+    $Arguments = @(
+        "docker run --rm"
+        "-v gmaps-playwright-cache:/opt"
+        "-v `"$PWD/$($OutputDir):/out`""
+        "gosom/google-maps-scraper"
+        "-query `"$Query`""
+        "-results /out/results.json"
+        "-json"
+        "-depth $Depth"
+        "-grid-bbox `"$bboxStr`""
+        "-grid-cell $CellSize"
+        "-exit-on-inactivity 3m"
+    )
+    if ($Email) { $Arguments += "-email" }
 
-    $cmd
+    return ($Arguments -join " ")
 }
