@@ -51,12 +51,12 @@ Describe "Invoke-DockerCommand" {
 
 Describe "Get-DockerCommand" {
     It "builds the docker run command with all parameters" {
-        $cmd = Get-DockerCommand -Query "Roofers Dallas" -BBox @(32.6, -96.85, 32.9, -96.65) -CellSize 2.0 -Depth 1 -Email
+        $cmd = Get-DockerCommand -BBox @(32.6, -96.85, 32.9, -96.65) -CellSize 2.0 -Depth 1 -Email
 
         $cmd | Should Match "^docker run"
         $cmd | Should Match "--rm"
         $cmd | Should Match "gosom/google-maps-scraper"
-        $cmd | Should Match '-query "Roofers Dallas"'
+        $cmd | Should Match "-input /workspace/queries.txt"
         $cmd | Should Match "-depth 1"
         $cmd | Should Match '-grid-bbox "32.6,-96.85,32.9,-96.65"'
         $cmd | Should Match "-grid-cell 2"
@@ -66,13 +66,13 @@ Describe "Get-DockerCommand" {
     }
 
     It "omits email flag when not requested" {
-        $cmd = Get-DockerCommand -Query "Roofers Dallas" -BBox @(32.6, -96.85, 32.9, -96.65)
+        $cmd = Get-DockerCommand -BBox @(32.6, -96.85, 32.9, -96.65)
 
         $cmd | Should Not Match "-email"
     }
 
     It "includes email flag when requested" {
-        $cmd = Get-DockerCommand -Query "Roofers Dallas" -BBox @(32.6, -96.85, 32.9, -96.65) -Email
+        $cmd = Get-DockerCommand -BBox @(32.6, -96.85, 32.9, -96.65) -Email
 
         $cmd | Should Match "-email"
     }

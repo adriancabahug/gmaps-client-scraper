@@ -33,7 +33,6 @@ function Invoke-DockerCommand {
 
 function Get-DockerCommand {
     param(
-        [Parameter(Mandatory)][string]$Query,
         [Parameter(Mandatory)][double[]]$BBox,
         [double]$CellSize = 2.0,
         [int]$Depth = 1,
@@ -46,9 +45,10 @@ function Get-DockerCommand {
     $Arguments = @(
         "docker run --rm"
         "-v gmaps-playwright-cache:/opt"
-        "-v `"$PWD/$($OutputDir):/out`""
+        "-v `"$($PWD):/workspace`""
+        "-v `"$($PWD)/$($OutputDir):/out`""
         "gosom/google-maps-scraper"
-        "-query `"$Query`""
+        "-input /workspace/queries.txt"
         "-results /out/results.json"
         "-json"
         "-depth $Depth"

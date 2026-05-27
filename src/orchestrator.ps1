@@ -38,7 +38,7 @@ function Invoke-ScraperPipeline {
     $cleanJsonFile = "$outputDir/prospects.json"
     $cleanCsvFile = "$outputDir/prospects.csv"
 
-    $cmd = Get-DockerCommand -Query ($pending -join " ") -BBox $bbox -Email -OutputDir $outputDir
+    $cmd = Get-DockerCommand -BBox $bbox -Email -OutputDir $outputDir
 
     if ($DryRun) {
         "[DRY-RUN] $cmd"
