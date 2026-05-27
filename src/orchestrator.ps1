@@ -55,10 +55,11 @@ function Invoke-ScraperPipeline {
             }
 
             if (Test-Path -Path $rawResultsFile) {
-                $rawResults = Import-RawResults -Path $rawResultsFile
-                $deduped = Remove-Duplicates -Results $rawResults
-                $filtered = Filter-HasPhone -Results $deduped
-                Export-CleanResults -Results $filtered -JsonPath $cleanJsonFile -CsvPath $cleanCsvFile
+                $clean = Import-RawResults -Path $rawResultsFile | Remove-Duplicates | Filter-HasPhone
+                if ($clean) {
+                    $clean | Export-CsvResults -Path $cleanCsvFile
+                    $clean | ConvertTo-Json -Depth 4 | Set-Content -Path $cleanJsonFile -Force
+                }
             }
         } catch {
             $state = Reset-StuckRunning -State $state
