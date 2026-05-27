@@ -6,12 +6,18 @@ function Import-RawResults {
         return @()
     }
 
-    $Content = Get-Content -Raw -Path $Path
-    if ([string]::IsNullOrWhiteSpace($Content)) {
-        return @()
+    $Objects = Get-Content -Path $Path | ForEach-Object {
+        $Line = $_.Trim()
+        if (-not [string]::IsNullOrWhiteSpace($Line)) {
+            try {
+                ConvertFrom-Json $Line
+            } catch {
+                Write-Warning "Skipping malformed JSON line: $Line"
+            }
+        }
     }
 
-    ConvertFrom-Json $Content
+    @($Objects)
 }
 
 function Remove-Duplicates {
