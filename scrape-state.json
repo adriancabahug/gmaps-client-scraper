@@ -1,11 +1,11 @@
 {
     "queries":  [
                     {
-                        "status":  "Pending",
+                        "status":  "Completed",
                         "text":  "Residential Roofing Contractors in Dallas, Texas",
                         "cell":  1
                     }
                 ],
-    "lastUpdated":  "2026-05-26T21:34:14.9068026Z",
+    "lastUpdated":  "2026-05-27T16:29:04.0626053Z",
     "version":  1
 }
