@@ -21,8 +21,10 @@ function Invoke-ScraperPipeline {
     $pending = Get-PendingQueries -State $state
 
     if ($pending.Count -eq 0) {
+        Write-Host "All queries completed. Nothing to scrape."
         return
     }
+    Write-Host "Pending queries: $($pending.Count)"
 
     if (-not $DryRun) {
         if (-not (Test-DockerInstalled)) {

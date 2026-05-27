@@ -11,6 +11,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Reset State for Fresh Run
+        run: rm -f scrape-state.json
+
       - name: Execute Scraper Pipeline
         shell: pwsh
         run: ./run-scraper.ps1
