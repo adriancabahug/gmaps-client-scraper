@@ -11,10 +11,7 @@
     entries, and exports CSV.
 
 .PARAMETER Query
-    The search query string (e.g. "Residential Roofing Contractors in Dallas, Texas").
-
-.PARAMETER City
-    City name for output filename context.
+    Search query string (e.g. "Residential Roofing Contractors in Dallas, Texas").
 
 .PARAMETER BBox
     Bounding box as array [minLat, minLon, maxLat, maxLon].
@@ -36,9 +33,6 @@
 param(
     [Parameter(Mandatory)]
     [string]$Query,
-
-    [Parameter(Mandatory)]
-    [string]$City,
 
     [Parameter(Mandatory)]
     [array]$BBox,
@@ -104,7 +98,7 @@ if (-not (Test-Path $rawOutputFile)) {
 
 # ── Process NDJSON: deduplicate by place_id, filter phone-present, export CSV ─
 $results = Get-Content -Path $rawOutputFile -Encoding UTF8 |
-    Where-Object { $_.Trim() -ne "" } |
+    Where-Object { $_.Trim().StartsWith("{") } |
     ForEach-Object { $_ | ConvertFrom-Json -Depth 10 } |
     Where-Object { $_.phone -and ($_.phone -ne "") } |
     Group-Object -Property place_id |

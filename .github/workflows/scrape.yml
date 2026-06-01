@@ -16,8 +16,7 @@ jobs:
         run: |
           ./run-scraper.ps1 `
             -Query "Residential Roofing Contractors in Dallas, Texas" `
-            -City "Dallas" `
-            -BBox @(32.6, -96.85, 32.9, -96.65) `
+            -BBox @(32.775, -96.820, 32.805, -96.770) `
             -CellSize 2.0 `
             -Depth 1 `
             -Email `

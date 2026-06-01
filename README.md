@@ -11,7 +11,7 @@ Scrapes Google Maps business listings (name, phone, address, rating, website) fo
 
 ## Customizing the Search
 
-Edit the query, bounding box, or city in `.github/workflows/scrape.yml` under the **Execute Scraper Pipeline** step. Get bounding box coordinates from [bboxfinder.com](http://bboxfinder.com).
+Edit the query or bounding box in `.github/workflows/scrape.yml` under the **Execute Scraper Pipeline** step. Get bounding box coordinates from [bboxfinder.com](http://bboxfinder.com).
 
 ## Files
 
