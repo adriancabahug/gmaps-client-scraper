@@ -70,6 +70,7 @@ $null = New-Item -ItemType Directory -Force -Path $OutDir
 
 # ── Write query to temp file ──────────────────────────────────────────────────
 $Query | Set-Content -Path $queriesFile -Encoding UTF8
+$null = New-Item -ItemType File -Force -Path $rawOutputFile
 
 # ── Build docker run command ──────────────────────────────────────────────────
 $dockerArgs = @(
