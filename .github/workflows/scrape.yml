@@ -11,22 +11,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Reset State for Fresh Run
-        run: rm -f scrape-state.json
-
       - name: Execute Scraper Pipeline
         shell: pwsh
-        run: ./run-scraper.ps1
+        run: |
+          ./run-scraper.ps1 `
+            -Query "Residential Roofing Contractors in Dallas, Texas" `
+            -City "Dallas" `
+            -BBox @(32.6, -96.85, 32.9, -96.65) `
+            -CellSize 2.0 `
+            -Depth 1 `
+            -Email `
+            -OutDir "gmaps-output"
 
       - name: Commit and Push Changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          mkdir -p gmaps-output
-
-          git add gmaps-output/ || true
-          git add scrape-state.json || true
-
-          git commit -m "Automated scrape: updated prospects and state [skip ci]" || echo "No changes to commit"
+          git add gmaps-output/
+          git commit -m "Automated scrape: updated prospects [skip ci]" || echo "No changes to commit"
           git push

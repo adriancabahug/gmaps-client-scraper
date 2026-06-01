@@ -1,28 +1,123 @@
+#!/usr/bin/env pwsh
+#Requires -Version 7
+
+<#
+.SYNOPSIS
+    Scrape Google Maps business listings via gosom/google-maps-scraper Docker image.
+
+.DESCRIPTION
+    Single-shot scraper for GitHub Actions. Writes query to temp file, runs Docker
+    container, reads NDJSON output, deduplicates by place_id, filters for phone-present
+    entries, and exports CSV.
+
+.PARAMETER Query
+    The search query string (e.g. "Residential Roofing Contractors in Dallas, Texas").
+
+.PARAMETER City
+    City name for output filename context.
+
+.PARAMETER BBox
+    Bounding box as array [minLat, minLon, maxLat, maxLon].
+
+.PARAMETER CellSize
+    Grid cell size in kilometres. Default: 2.0
+
+.PARAMETER Depth
+    Search depth. Default: 1
+
+.PARAMETER Email
+    Switch to enable email extraction.
+
+.PARAMETER OutDir
+    Output directory. Default: "gmaps-output"
+#>
+
+[CmdletBinding()]
 param(
-    [switch]$DryRun,
-    [string]$City = "dallas"
+    [Parameter(Mandatory)]
+    [string]$Query,
+
+    [Parameter(Mandatory)]
+    [string]$City,
+
+    [Parameter(Mandatory)]
+    [array]$BBox,
+
+    [double]$CellSize = 2.0,
+
+    [int]$Depth = 1,
+
+    [switch]$Email,
+
+    [string]$OutDir = "gmaps-output"
 )
 
-try {
-    Write-Host "Booting scraper pipeline..."
-    Write-Host "  PWD: $PWD"
-    Write-Host "  PSScriptRoot: $PSScriptRoot"
+$ErrorActionPreference = "Stop"
 
-    if (-not (Test-Path "$PSScriptRoot/queries.txt")) {
-        throw "Missing queries.txt in $PSScriptRoot"
-    }
-    if (-not (Test-Path "$PSScriptRoot/config.json")) {
-        throw "Missing config.json in $PSScriptRoot"
-    }
-
-    . "$PSScriptRoot/src/config.ps1"
-    . "$PSScriptRoot/src/query-manager.ps1"
-    . "$PSScriptRoot/src/scraper-runner.ps1"
-    . "$PSScriptRoot/src/output-processor.ps1"
-    . "$PSScriptRoot/src/orchestrator.ps1"
-
-    Invoke-ScraperPipeline -DryRun:$DryRun -City $City
-} catch {
-    Write-Error "Pipeline failed: $_"
-    exit 1
+# ── Validate bounding box ─────────────────────────────────────────────────────
+if ($BBox.Count -ne 4) {
+    throw "BBox must contain exactly 4 elements: [minLat, minLon, maxLat, maxLon]"
 }
+
+$minLat, $minLon, $maxLat, $maxLon = $BBox
+
+# ── Prepare directories ───────────────────────────────────────────────────────
+$tempDir = [System.IO.Path]::GetTempPath()
+$queriesFile = Join-Path $tempDir "queries.txt"
+$rawOutputFile = Join-Path $tempDir "results.json"
+
+$null = New-Item -ItemType Directory -Force -Path $OutDir
+
+# ── Write query to temp file ──────────────────────────────────────────────────
+$Query | Set-Content -Path $queriesFile -Encoding UTF8
+
+# ── Build docker run command ──────────────────────────────────────────────────
+$dockerArgs = @(
+    "run", "--rm",
+    "-v", "${queriesFile}:/input/queries.txt",
+    "-v", "${rawOutputFile}:/output/results.json",
+    "gosom/google-maps-scraper",
+    "-input", "/input/queries.txt",
+    "-results", "/output/results.json",
+    "-depth", $Depth,
+    "-grid-bbox", "${minLat},${minLon},${maxLat},${maxLon}",
+    "-grid-cell", $CellSize
+)
+
+if ($Email) {
+    $dockerArgs += "-email"
+}
+
+# ── Execute scraper ───────────────────────────────────────────────────────────
+Write-Host "Running gosom/google-maps-scraper..."
+& docker @dockerArgs
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Docker scraper exited with code $LASTEXITCODE"
+}
+
+# ── Check output exists ───────────────────────────────────────────────────────
+if (-not (Test-Path $rawOutputFile)) {
+    throw "Expected output file not found: $rawOutputFile"
+}
+
+# ── Process NDJSON: deduplicate by place_id, filter phone-present, export CSV ─
+$results = Get-Content -Path $rawOutputFile -Encoding UTF8 |
+    Where-Object { $_.Trim() -ne "" } |
+    ForEach-Object { $_ | ConvertFrom-Json -Depth 10 } |
+    Where-Object { $_.phone -and ($_.phone -ne "") } |
+    Group-Object -Property place_id |
+    ForEach-Object { $_.Group | Select-Object -First 1 } |
+    Select-Object -Property @(
+        @{ Name = "Name";     Expression = { $_.title } },
+        @{ Name = "Phone";    Expression = { $_.phone } },
+        @{ Name = "Address";  Expression = { $_.address } },
+        @{ Name = "Rating";   Expression = { $_.review_rating } },
+        @{ Name = "Website";  Expression = { $_.web_site } }
+    )
+
+# ── Export CSV ────────────────────────────────────────────────────────────────
+$csvPath = Join-Path $OutDir "prospects.csv"
+$results | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
+
+Write-Host "Exported $($results.Count) prospects to $csvPath"

@@ -1,28 +1,54 @@
-# Google Maps Scraper — Domain Glossary
+# Context: Google Maps Scraper Pipeline
 
-## Concept
+## Objective
 
-A PowerShell orchestration pipeline that wraps the `gosom/google-maps-scraper` Docker image. It scrapes business listings from Google Maps for a target area, deduplicates the results, and exports a clean prospect list for cold-calling outreach.
+Scrape business listings (name, phone, website, address, rating) for Residential Roofing Contractors in Dallas, Texas to build a cold-calling prospect list. Absolutely free — no paid APIs, proxies, or services.
 
-## Glossary
+## Solution
 
-| Term | Definition |
-|---|---|
-| **Query** | A search string passed to Google Maps, e.g. "Residential Roofing Contractors in Dallas, Texas" |
-| **State** | A persisted JSON file tracking which queries are `Pending`, `Running`, or `Completed` — enables crash recovery and resume |
-| **Bounding box (bbox)** | Four coordinates `[minLat, minLon, maxLat, maxLon]` defining a rectangular area over a city |
-| **Grid cell** | A subdivision of the bounding box (e.g. 2 km) — the scraper searches each cell independently to bypass the ~200-result cap |
-| **Grid scraping** | Strategy of dividing a city into overlapping cells so Google's per-query result cap doesn't limit total coverage |
-| **Dry run** | Pipeline mode that prints the `docker run` command without executing it — used for verification |
-| **Place ID** | Google's unique identifier for a business listing — used for deduplication |
-| **Prospect** | A scraped business record that has passed filtering (has phone, deduplicated) |
+A single PowerShell script (`run-scraper.ps1`) orchestrated via GitHub Actions. It runs the open-source `gosom/google-maps-scraper` Docker image on an ephemeral Ubuntu runner, processes the NDJSON output to deduplicate and filter, and commits a CSV back to the repo.
+
+## Architecture
+
+```
+Trigger (manual) → GitHub Actions (ubuntu-latest) → Docker (gosom) → NDJSON → Dedup → Filter → CSV → Commit to repo
+```
+
+Everything is in one file — no modules, no config files, no state machine.
 
 ## Key Decisions
 
-- **Coordinates are manual** — bounding boxes are configured in `config.json`, not geocoded. Use `bboxfinder.com` to draw them.
-- **No proxies** — the free-tier pipeline runs without residential proxies. The gosom image supports them optionally.
-- **Docker prerequisite** — the scraper itself runs inside a Docker container. The pipeline orchestrates it from outside.
+**GitHub Actions over local execution.**
+Local Docker Desktop has admin restrictions. GitHub provides 2,000 free minutes/month on cloud runners with Docker pre-installed.
 
-## ADRs
+**Single script file over modules.**
+Multiple files with dot-source paths caused cross-platform path issues (Join-Path, backslash/forward-slash). One top-to-bottom script eliminates loading order bugs and works identically on Windows PowerShell Core and Linux pwsh.
 
-None yet.
+**No state machine / resume logic.**
+Each workflow run is on a fresh ephemeral VM. If it fails, the user re-runs. No state file, no "Pending/Running/Completed" tracking, no crash recovery.
+
+**No config file.**
+Parameters are passed directly to the script. Bounding box coordinates are hardcoded in the workflow YAML. This avoids file-not-found errors and JSON parsing complexity.
+
+**`& docker @dockerArgs` over `Invoke-Expression`.**
+Direct splatting is safer, more readable, and avoids quoting/escaping bugs that plagued string concatenation approaches. Exit codes propagate naturally via `$LASTEXITCODE`.
+
+**NDJSON line-by-line parsing over JSON array.**
+The gosom scraper outputs one JSON object per line (NDJSON). `Get-Content | ConvertFrom-Json` per line handles this natively. `ConvertFrom-Json` on the whole file fails when it encounters multiple root objects.
+
+**`Group-Object -Property place_id` for dedup.**
+Pure PowerShell, no HashSet needed. Keeps the first occurrence per group. Streamed via pipeline.
+
+**CSV only as output format.**
+Excel-ready. Columns: Name, Phone, Address, Rating, Website. No JSON output — the raw NDJSON is lost after processing.
+
+## Anti-Requirments (What We Chose NOT To Build)
+
+- No multi-query batching — one query per run
+- No proxy configuration
+- No web UI or dashboard
+- No scheduled/cron recurring scraping
+- No geocoding — bounding box coordinates are manual
+- No tests — the script is simple enough to verify by running
+- No Docker installation checks — guaranteed on ubuntu-latest
+- No local development workflow — the script only runs in CI
