@@ -18,4 +18,11 @@ Edit the query or bounding box in `.github/workflows/scrape.yml` under the **Exe
 | File | Purpose |
 |---|---|
 | `run-scraper.ps1` | Single-file scraper: writes query → runs Docker → processes NDJSON → exports CSV |
+| `run-scraper.Tests.ps1` | Pester tests for NDJSON pipeline logic (parsing, filtering, dedup, column mapping) |
 | `.github/workflows/scrape.yml` | GitHub Actions workflow — manual trigger, ubuntu-latest, commits output back |
+
+## Running Tests
+
+```powershell
+Invoke-Pester -Script ".\run-scraper.Tests.ps1"
+```

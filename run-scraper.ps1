@@ -76,7 +76,8 @@ $dockerArgs = @(
     "-results", "/output/results.json",
     "-depth", $Depth,
     "-grid-bbox", "${minLat},${minLon},${maxLat},${maxLon}",
-    "-grid-cell", $CellSize
+    "-grid-cell", $CellSize,
+    "-json"
 )
 
 if ($Email) {
@@ -98,7 +99,7 @@ if (-not (Test-Path $rawOutputFile)) {
 
 # ── Process NDJSON: deduplicate by place_id, filter phone-present, export CSV ─
 $results = Get-Content -Path $rawOutputFile -Encoding UTF8 |
-    Where-Object { $_.Trim().StartsWith("{") } |
+    Where-Object { $trimmed = $_.Trim(); $trimmed.StartsWith("{") -or $trimmed.StartsWith("[") } |
     ForEach-Object { $_ | ConvertFrom-Json -Depth 10 } |
     Where-Object { $_.phone -and ($_.phone -ne "") } |
     Group-Object -Property place_id |

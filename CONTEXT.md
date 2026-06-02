@@ -49,6 +49,5 @@ Excel-ready. Columns: Name, Phone, Email, Website, Rating, ReviewCount, Address.
 - No web UI or dashboard
 - No scheduled/cron recurring scraping
 - No geocoding — bounding box coordinates are manual
-- No tests — the script is simple enough to verify by running
 - No Docker installation checks — guaranteed on ubuntu-latest
 - No local development workflow — the script only runs in CI
