@@ -2,7 +2,7 @@
 
 ## Objective
 
-Scrape business listings (name, phone, website, address, rating) for Residential Roofing Contractors in Dallas, Texas to build a cold-calling prospect list. Absolutely free — no paid APIs, proxies, or services.
+Scrape business listings (name, phone, email, website, rating, review count, address) for Residential Roofing Contractors in Dallas, Texas to build a cold-calling prospect list. Absolutely free — no paid APIs, proxies, or services.
 
 ## Solution
 
@@ -40,7 +40,7 @@ The gosom scraper outputs one JSON object per line (NDJSON). `Get-Content | Conv
 Pure PowerShell, no HashSet needed. Keeps the first occurrence per group. Streamed via pipeline.
 
 **CSV only as output format.**
-Excel-ready. Columns: Name, Phone, Address, Rating, Website. No JSON output — the raw NDJSON is lost after processing.
+Excel-ready. Columns: Name, Phone, Email, Website, Rating, ReviewCount, Address. No JSON output — the raw NDJSON is lost after processing.
 
 ## Anti-Requirments (What We Chose NOT To Build)
 

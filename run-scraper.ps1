@@ -104,11 +104,13 @@ $results = Get-Content -Path $rawOutputFile -Encoding UTF8 |
     Group-Object -Property place_id |
     ForEach-Object { $_.Group | Select-Object -First 1 } |
     Select-Object -Property @(
-        @{ Name = "Name";     Expression = { $_.title } },
-        @{ Name = "Phone";    Expression = { $_.phone } },
-        @{ Name = "Address";  Expression = { $_.address } },
-        @{ Name = "Rating";   Expression = { $_.review_rating } },
-        @{ Name = "Website";  Expression = { $_.web_site } }
+        @{ Name = "Name";        Expression = { $_.title } },
+        @{ Name = "Phone";       Expression = { $_.phone } },
+        @{ Name = "Email";       Expression = { $_.emails -join "; " } },
+        @{ Name = "Website";     Expression = { $_.web_site } },
+        @{ Name = "Rating";      Expression = { $_.review_rating } },
+        @{ Name = "ReviewCount"; Expression = { $_.review_count } },
+        @{ Name = "Address";     Expression = { $_.address } }
     )
 
 # ── Export CSV ────────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 # Google Maps Scraper
 
-Scrapes Google Maps business listings (name, phone, address, rating, website) for cold-calling prospecting using the [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper) Docker image.
+Scrapes Google Maps business listings (name, phone, email, website, rating, review count, address) for cold-calling prospecting using the [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper) Docker image.
 
 ## How to Use
 
